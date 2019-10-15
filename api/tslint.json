@@ -1,20 +1,22 @@
 {
   "defaultSeverity": "error",
   "extends": [
-    "tslint:recommended"
+    "tslint-config-airbnb"
   ],
   "jsRules": {},
   "rules": {
-    "interface-name": false,
-    "no-console": false,
-    "member-ordering": [
+    "max-line-length": [
       true,
-      {
-        "order": "fields-first"
-      }
+      120
     ],
-    "ordered-imports": true,
-    "object-literal-sort-keys": true
+    "object-shorthand-properties-first": false,
+    "object-literal-sort-keys": [
+      "match-declaration-order"
+    ],
+    "indent": [ true, "spaces", 2 ],
+    "import-name": [ true, { "lodash": "_" } ],
+    "align": [ true, "statements", "members", "elements" ],
+    "object-literal-key-quotes": [false]
   },
   "rulesDirectory": []
 }

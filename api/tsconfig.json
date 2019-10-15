@@ -1,20 +1,34 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
-    "target": "es6",
+    "target": "ES6",
     "module": "commonjs",
     "lib": [
-      "esnext"
+      "es6",
+      "es2017"
     ],
+    "types": [
+      "node"
+    ],
+    "declaration": true,
     "sourceMap": true,
+    "outDir": "tsc-out",
     "strict": true,
-    "noImplicitAny": false,
     "moduleResolution": "node",
-    "resolveJsonModule": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ],
     "esModuleInterop": true,
-    "outDir": "./tsc-out"
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false
   },
+  "include": [
+    "src/**/*.ts"
+  ],
   "exclude": [
-    "node_modules",
-    "tsc-out"
+    "node_modules/**/*",
+    "spec"
   ]
 }
