@@ -1,7 +1,7 @@
-import * as express from 'express';
 import { XmlHandler } from '../handlers/XmlHandler';
+import * as express from 'express';
 import multer from 'multer';
-import { Database } from 'sqlite3';
+
 const upload = multer();
 
 export class NmapRouter {

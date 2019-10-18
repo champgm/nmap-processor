@@ -1,17 +1,15 @@
-import { MappedPort } from '../interfaces/Mapped';
-import * as bunyan from 'bunyan';
-import * as DotEnv from 'dotenv';
-import { NextFunction, Request, Response } from 'express-serve-static-core';
-import * as path from 'path';
-import { parseStringPromise } from 'xml2js';
-import { enumerateError } from '../common/Enumerator';
-import { ParsedNmap, Port } from '../interfaces/ParsedNmap';
-import { Database } from 'sqlite3';
-import { hostsTableName } from '../common/Sql';
 
-const bunyanLogger = bunyan.createLogger({
-  name: `${path.basename(__filename)}`,
-});
+import { Database } from 'sqlite3';
+import { NextFunction, Request, Response } from 'express-serve-static-core';
+import { parseStringPromise } from 'xml2js';
+import { v4 } from 'uuid';
+import * as path from 'path';
+import bunyan from 'bunyan';
+
+import { enumerateError } from '../common/Enumerator';
+import { hostsTableName } from '../common/Sql';
+import { MappedPort } from '../interfaces/Mapped';
+import { ParsedNmap, Port } from '../interfaces/ParsedNmap';
 
 export class XmlHandler {
   constructor(private database: Database) { }
@@ -21,6 +19,10 @@ export class XmlHandler {
     response: Response,
     nextFunction: NextFunction,
   ) {
+    const bunyanLogger = bunyan.createLogger({
+      name: `${path.basename(__filename)}`,
+      transactionId: v4(),
+    });
     const fileBuffer: Buffer = (request as any).file.buffer;
     if (fileBuffer) {
       bunyanLogger.info({
@@ -32,7 +34,7 @@ export class XmlHandler {
       // Parse the XML
       let parsedNmap: ParsedNmap;
       try {
-        parsedNmap = await this.parseNmap(fileBuffer);
+        parsedNmap = await this.parseNmap(fileBuffer, bunyanLogger);
       } catch (error) {
         const context = {
           message: 'Unable to parse incoming file',
@@ -53,7 +55,6 @@ export class XmlHandler {
               `'${JSON.stringify(this.getHostNames(nmapHost.hostnames))}',` +
               `'${JSON.stringify(this.getPorts(nmapHost.ports))}'` +
               ');';
-            console.log(`insert query: ${insertQuery}`);
             this.database.run(insertQuery);
           } catch (error) {
             const context = {
@@ -101,7 +102,7 @@ export class XmlHandler {
     return mappedPorts;
   }
 
-  async  parseNmap(fileBuffer: Buffer): Promise<ParsedNmap> {
+  async  parseNmap(fileBuffer: Buffer, bunyanLogger: any): Promise<ParsedNmap> {
     const fileContents = fileBuffer.toString('utf8');
     const parsedNmap = await parseStringPromise(fileContents);
     bunyanLogger.info({
@@ -118,55 +119,3 @@ export class XmlHandler {
   }
 
 }
-
-// export async function xmlHandler(
-//   request: Request,
-//   response: Response,
-//   nextFunction: NextFunction,
-// ) {
-//   const fileBuffer: Buffer = (request as any).file.buffer;
-//   if (fileBuffer) {
-//     bunyanLogger.info({
-//       body: request.body,
-//       headers: request.headers,
-//       request,
-//     }, 'Received XML file request');
-
-//     // Parse the XML
-//     let parsedNmap: ParsedNmap;
-//     try {
-//       parsedNmap = await parseNmap(fileBuffer);
-//     } catch (error) {
-//       const context = {
-//         message: 'Unable to parse incoming file',
-//         error: enumerateError(error),
-//       };
-//       bunyanLogger.error(context, context.message);
-//       response.status(400).send(context);
-//     }
-
-// // Open the SQL database
-
-//     // Store in sqlite
-//   } else {
-//     const context = { message: 'File not found in request' };
-//     bunyanLogger.error(context, context.message);
-//     response.status(400).send(context);
-//   }
-// }
-
-// async function parseNmap(fileBuffer: Buffer): Promise<ParsedNmap> {
-//   const fileContents = fileBuffer.toString('utf8');
-//   const parsedNmap = await parseStringPromise(fileContents);
-//   bunyanLogger.info({
-//     fileContents,
-//     nmap: parsedNmap,
-//   }, 'Successfully parsed XML file');
-//   return parsedNmap;
-// }
-
-// function next(nextFunction: NextFunction, input: any) {
-//   if (nextFunction) {
-//     nextFunction(input);
-//   }
-// }

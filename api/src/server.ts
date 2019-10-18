@@ -1,15 +1,14 @@
-import path from 'path';
-import sqlite3, { Database } from 'sqlite3';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import express from 'express';
 import expressBunyanLogger from 'express-bunyan-logger';
 import morgan from 'morgan';
+import sqlite3, { Database } from 'sqlite3';
+
+import { databaseFilePath, hostsTableName } from './common/Sql';
 import { NmapRouter } from './routing/NmapRouter';
 import { StaticRouter } from './routing/StaticRouter';
 import { XmlHandler } from './handlers/XmlHandler';
-import { run, databaseFilePath, hostsTableName } from './common/Sql';
-
 
 export const expressApp = express();
 expressApp.use(morgan('common'));
