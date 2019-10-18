@@ -1,7 +1,30 @@
 export interface ParsedNmap {
   nmaprun: {
-    host: NmapHost,
+    host: NmapHost[],
   };
+}
+
+export interface Port {
+  port: {
+    $: {
+      protocol: string,
+      portid: string,
+    },
+    state: {
+      $: {
+        state: string,
+        reason: string,
+        reason_ttl: string,
+      },
+    }[],
+    service: {
+      $: {
+        name: string,
+        method: string,
+        conf: string,
+      },
+    }[],
+  }[];
 }
 
 export interface NmapHost {
@@ -16,160 +39,26 @@ export interface NmapHost {
       reason_ttl: string,
     },
   }[];
-  address:
-    {
+  address: {
+    $: {
+      addr: string,
+      addrtype: string,
+    },
+  }[];
+  hostnames: {
+    hostname: {
       $: {
-        addr: string,
-        addrtype: string,
+        name: string,
+        type: string,
       },
-    }
-  [];
-  hostnames:
-    {
-      hostname:
-        {
-          $: {
-            name: string,
-            type: string,
-          },
-        }
-      [],
-    }
-  [];
-  ports: [
-    {
-      port: [
-        {
-          $: {
-            protocol: string,
-            portid: string,
-          },
-          state: [
-            {
-              $: {
-                state: string,
-                reason: string,
-                reason_ttl: string,
-              },
-            }
-          ],
-          service: [
-            {
-              $: {
-                name: string,
-                method: string,
-                conf: string,
-              },
-            }
-          ],
-        },
-        {
-          $: {
-            protocol: string,
-            portid: string,
-          },
-          state: [
-            {
-              $: {
-                state: string,
-                reason: string,
-                reason_ttl: string,
-              },
-            }
-          ],
-          service: [
-            {
-              $: {
-                name: string,
-                method: string,
-                conf: string,
-              },
-            }
-          ],
-        },
-        {
-          $: {
-            protocol: string,
-            portid: string,
-          },
-          state: [
-            {
-              $: {
-                state: string,
-                reason: string,
-                reason_ttl: string,
-              },
-            }
-          ],
-          service: [
-            {
-              $: {
-                name: string,
-                method: string,
-                conf: string,
-              },
-            }
-          ],
-        },
-        {
-          $: {
-            protocol: string,
-            portid: string,
-          },
-          state: [
-            {
-              $: {
-                state: string,
-                reason: string,
-                reason_ttl: string,
-              },
-            }
-          ],
-          service: [
-            {
-              $: {
-                name: string,
-                method: string,
-                conf: string,
-              },
-            }
-          ],
-        },
-        {
-          $: {
-            protocol: string,
-            portid: string,
-          },
-          state: [
-            {
-              $: {
-                state: string,
-                reason: string,
-                reason_ttl: string,
-              },
-            }
-          ],
-          service: [
-            {
-              $: {
-                name: string,
-                method: string,
-                conf: string,
-              },
-            }
-          ],
-        }
-      ],
-    }
-  ];
-  times: [
-    {
-      $: {
-        srtt: string,
-        rttvar: string,
-        to: string,
-      },
-    }
-  ];
-},
+    }[],
+  }[];
+  ports: Port[];
+  times: {
+    $: {
+      srtt: string,
+      rttvar: string,
+      to: string,
+    },
+  }[];
 }
