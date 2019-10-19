@@ -7,7 +7,7 @@ export class StaticRouter {
 
   constructor() {
     this.router = express.Router();
-    this.frontend = path.join(__dirname, '../../dist');
+    this.frontend = path.join(__dirname, '../../../frontend/build');
     console.log(`Will host static content from ${this.frontend}`);
   }
 
