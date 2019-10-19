@@ -9,6 +9,7 @@ import { databaseFilePath, hostsTableName } from './common/Sql';
 import { NmapRouter } from './routing/NmapRouter';
 import { StaticRouter } from './routing/StaticRouter';
 import { XmlHandler } from './handlers/XmlHandler';
+import { RetrievalHandler } from './handlers/RetrievalHandler';
 
 export const expressApp = express();
 expressApp.use(morgan('common'));
@@ -22,14 +23,17 @@ process.on('SIGINT', () => database.close());
 process.on('exit', () => database.close());
 prepareDatabase(database).then(() => {
   const xmlHandler: XmlHandler = new XmlHandler(database);
+  const retrievalHandler: RetrievalHandler = new RetrievalHandler(database);
 
   expressApp.use(new StaticRouter().init().getRouter());
-  expressApp.use(new NmapRouter(xmlHandler, express.Router()).init().getRouter());
+  expressApp.use(new NmapRouter(
+    xmlHandler,
+    retrievalHandler,
+    express.Router(),
+  ).init().getRouter());
 
   expressApp.use(expressBunyanLogger.errorLogger());
 });
-
-async function listTables() { }
 
 async function prepareDatabase(database: Database) {
   const tableCreate = `create table if not exists ${hostsTableName} (` +

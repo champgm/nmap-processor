@@ -23,55 +23,62 @@ export class XmlHandler {
       name: `${path.basename(__filename)}`,
       transactionId: v4(),
     });
-    const fileBuffer: Buffer = (request as any).file.buffer;
-    if (fileBuffer) {
-      bunyanLogger.info({
-        body: request.body,
-        headers: request.headers,
-        request,
-      }, 'Received XML file request');
+    try {
+      const fileBuffer: Buffer = (request as any).file.buffer;
+      if (fileBuffer) {
+        bunyanLogger.info({
+          body: request.body,
+          headers: request.headers,
+          request,
+        }, 'Received XML file request');
 
-      // Parse the XML
-      let parsedNmap: ParsedNmap;
-      try {
-        parsedNmap = await this.parseNmap(fileBuffer, bunyanLogger);
-      } catch (error) {
-        const context = {
-          message: 'Unable to parse incoming file',
-          error: enumerateError(error),
-        };
+        // Parse the XML
+        let parsedNmap: ParsedNmap;
+        try {
+          parsedNmap = await this.parseNmap(fileBuffer, bunyanLogger);
+        } catch (error) {
+          const context = {
+            message: 'Unable to parse incoming file',
+            error: enumerateError(error),
+          };
+          bunyanLogger.error(context, context.message);
+          response.status(400).send(context);
+        }
+
+        // Insert rows into table
+        const query = this.database.prepare(`insert or replace into ${hostsTableName} values (?,?,?,?,?)`);
+        parsedNmap.nmaprun.host.forEach((nmapHost) => {
+          nmapHost.address.forEach((address) => {
+            try {
+              query.run(
+                address.$.addr,
+                nmapHost.status[0].$.state,
+                parseInt(nmapHost.$.starttime, 10),
+                JSON.stringify(this.getHostNames(nmapHost.hostnames)),
+                JSON.stringify(this.getPorts(nmapHost.ports)),
+              );
+            } catch (error) {
+              const context = {
+                nmapHost,
+                message: 'Could not execute insert query for host',
+                error: enumerateError(error),
+              };
+              bunyanLogger.error(context, context.message);
+              throw error;
+            }
+          });
+        });
+        query.finalize();
+        response.status(202).send();
+      } else {
+        const context = { message: 'File not found in request' };
         bunyanLogger.error(context, context.message);
         response.status(400).send(context);
       }
-
-      // Insert rows into table
-      parsedNmap.nmaprun.host.forEach((nmapHost) => {
-        nmapHost.address.forEach((address) => {
-          try {
-            const insertQuery = `INSERT OR REPLACE INTO ${hostsTableName} values (` +
-              `'${address.$.addr}',` +
-              `'${nmapHost.status[0].$.state}',` +
-              `${nmapHost.$.starttime},` +
-              `'${JSON.stringify(this.getHostNames(nmapHost.hostnames))}',` +
-              `'${JSON.stringify(this.getPorts(nmapHost.ports))}'` +
-              ');';
-            this.database.run(insertQuery);
-          } catch (error) {
-            const context = {
-              nmapHost,
-              message: 'Could not execute insert query for host',
-              error: enumerateError(error),
-            };
-            bunyanLogger.error(context, context.message);
-            throw error;
-          }
-        });
-      });
-      response.status(202).send();
-    } else {
-      const context = { message: 'File not found in request' };
-      bunyanLogger.error(context, context.message);
-      response.status(400).send(context);
+    } catch (error) {
+      const enumeratedError = enumerateError(error);
+      bunyanLogger.error({ error: enumeratedError }, 'An unexpected error ocurred');
+      response.status(500).send(enumeratedError);
     }
   }
 
