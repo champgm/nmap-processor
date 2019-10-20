@@ -8,21 +8,24 @@ const get = {
 export class HostsApi {
   async getAllAddresses(): Promise<string[]> {
     try {
-      const uri = `http://localhost:4200/addresses/`;
+      const uri = `addresses/`;
       const fetchResult = await fetch(uri, get);
       console.log(`fetchResult${JSON.stringify(fetchResult, null, 2)}`);
-      const addresses = await fetchResult.json();
+      const addresses: string[] = await fetchResult.json();
       console.log(`Retrieved addresses:${JSON.stringify(addresses, null, 2)}`);
-      return addresses;
+      return addresses.sort();
     } catch (error) {
       console.log(`Unable to retrieve addresses: ${error}`);
-      return ['error'];
+      return [
+        'No Hosts Found',
+      ];
     }
   }
 
   async getHost(address: string): Promise<ParsedTableHost> {
     const uri = `addresses/${address}`;
-    const host = await (await fetch(uri, get)).json();
+    const host: ParsedTableHost = await (await fetch(uri, get)).json();
+    host.hostnames = host.hostnames.sort();
     return host;
   }
 }

@@ -1,0 +1,122 @@
+{
+	"info": {
+		"_postman_id": "fd84fd71-6205-45d1-8c9a-c8e68fe3f00d",
+		"name": "nmap-processor",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Upload File",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/mac/github/nmap-processor/assets/nmap.results.xml"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:4200/xml",
+					"host": [
+						"localhost"
+					],
+					"port": "4200",
+					"path": [
+						"xml"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Addresses",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/Users/gchampion/github/nmap-processor/assets/nmap.results.xml"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:4200/addresses",
+					"host": [
+						"localhost"
+					],
+					"port": "4200",
+					"path": [
+						"addresses"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "One Address",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/Users/gchampion/github/nmap-processor/assets/nmap.results.xml"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:4200/addresses/158.69.205.102",
+					"host": [
+						"localhost"
+					],
+					"port": "4200",
+					"path": [
+						"addresses",
+						"158.69.205.102"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

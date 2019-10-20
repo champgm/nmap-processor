@@ -20,7 +20,7 @@ export interface Props {
 
 interface State {
   addresses: string[];
-  displayedHost: ParsedTableHost;
+  displayedHost?: ParsedTableHost;
 }
 
 export class HostList extends Component<Props, State> {
@@ -31,13 +31,6 @@ export class HostList extends Component<Props, State> {
     this.hostsApi = props.hostsApi
     this.state = {
       addresses: ['1', '2'],
-      displayedHost: {
-        address: '12345',
-        status: 'ok',
-        scanStart: 0,
-        hostnames: [],
-        ports: [],
-      }
     };
   }
 
@@ -54,7 +47,7 @@ export class HostList extends Component<Props, State> {
   }
 
   getHostnamesListItems() {
-    return this.state.displayedHost.hostnames.length > 0
+    return (this.state.displayedHost && this.state.displayedHost.hostnames.length > 0)
       ? this.state.displayedHost.hostnames.map((hostname) => {
         return (
           <ListItem key={hostname}>
@@ -66,7 +59,7 @@ export class HostList extends Component<Props, State> {
   }
 
   getPortSummary() {
-    return this.state.displayedHost.ports.length > 0
+    return (this.state.displayedHost && this.state.displayedHost.ports.length > 0)
       ? this.state.displayedHost.ports.map((port) => {
         let color: "default" | "inherit" | "secondary" | "primary" | undefined;
         switch (port.state) {
@@ -99,53 +92,56 @@ export class HostList extends Component<Props, State> {
   }
 
   getHostSummary() {
-    return (
-      <Grid
-        container
-        direction="column"
-        justify="center"
-        alignItems="center"
-        spacing={2}
-      >
-        <Grid item>
-          <Typography variant="h3" component="h3">
-            {this.state.displayedHost.address}
-          </Typography>
-          <Divider />
-        </Grid>
+    if (this.state.displayedHost) {
+      return (
+        <Grid
+          container
+          direction="column"
+          justify="center"
+          alignItems="center"
+          spacing={2}
+        >
+          <Grid item>
+            <Typography variant="h3" component="h3">
+              {this.state.displayedHost.address}
+            </Typography>
+            <Divider />
+          </Grid>
 
-        <Grid item>
-          <Chip label={`Host status ${this.state.displayedHost.status} as of ${(new Date(this.state.displayedHost.scanStart)).toLocaleString()}`} />
-        </Grid>
+          <Grid item>
+            <Chip label={`Host status ${this.state.displayedHost.status} as of ${(new Date(this.state.displayedHost.scanStart)).toLocaleString()}`} />
+          </Grid>
 
-        <Grid item>
-          <Typography variant="h5">
-            Known Hostnames
+          <Grid item>
+            <Typography variant="h5">
+              Known Hostnames
         </Typography>
-          <List dense>
-            {this.getHostnamesListItems()}
-          </List>
-        </Grid>
+            <List dense>
+              {this.getHostnamesListItems()}
+            </List>
+          </Grid>
 
-        <Grid item>
-          <Typography variant="h5">
-            Port Summary
+          <Grid item>
+            <Typography variant="h5">
+              Port Summary
         </Typography>
-          <List dense>
-            {this.getPortSummary()}
-          </List>
-        </Grid>
+            <List dense>
+              {this.getPortSummary()}
+            </List>
+          </Grid>
 
-      </Grid>
-    );
+        </Grid>
+      );
+    }
+    return undefined;
   }
 
   render(): JSX.Element {
-    const listItems = this.state.addresses.map((address) => {
+    const allAddresses = this.state.addresses.map((address) => {
       return (
         <ListItem
           key={address}
-          selected={this.state.displayedHost.address === address}
+          selected={(this.state.displayedHost && this.state.displayedHost.address === address)}
           onClick={event => this.changeDisplayedHost(address)}
         >
           <ListItemAvatar>
@@ -166,8 +162,11 @@ export class HostList extends Component<Props, State> {
         spacing={5}
       >
         <Grid item xs={2}>
-          <List>
-            {listItems}
+          <List style={{
+            overflow: 'auto',
+            maxHeight: 500
+          }}>
+            {allAddresses}
           </List>
         </Grid>
         <Grid item xs={4}>

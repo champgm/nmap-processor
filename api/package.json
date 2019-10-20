@@ -27,9 +27,10 @@
     "multer": "^1.4.2",
     "path": "^0.12.7",
     "sqlite3": "^4.1.0",
-    "typescript": "^3.0.3",
     "uuid": "^3.3.3",
-    "xml2js": "^0.4.22"
+    "xml2js": "^0.4.22",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.4"
   },
   "devDependencies": {
     "@types/bunyan": "^1.8.6",

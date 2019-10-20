@@ -1,0 +1,23 @@
+{
+  "name": "nmap-processor",
+  "version": "1.0.0",
+  "description": "### API  * An Express.js backend which parses and stores nmap results in XML format  * A Postman collection, `nmap-processor.postman_collection.json` has been included for testing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "frontend-dependencies": "npm install --prefix frontend",
+    "api-dependencies":"npm install --prefix api",
+    "build":"npm run build --prefix frontend",
+    "start":"npm run frontend-dependencies && npm run api-dependencies && npm run build && npm run start --prefix api"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/champgm/nmap-processor.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/champgm/nmap-processor/issues"
+  },
+  "homepage": "https://github.com/champgm/nmap-processor#readme"
+}
